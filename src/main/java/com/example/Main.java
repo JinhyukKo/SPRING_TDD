@@ -7,9 +7,9 @@ import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args)  throws ClassNotFoundException, SQLException {
-        System.out.println("Hello world!");
         User newUser = new User();
         UserDao userDao = new UserDao();
+
         newUser.setPassword("password");
         newUser.setUsername("username");
         userDao.add(newUser);
