@@ -1,4 +1,4 @@
-package com.example.entity;
+package com.example.domain;
 
 public class User{
     private String username;
