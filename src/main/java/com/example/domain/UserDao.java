@@ -3,9 +3,9 @@ package com.example.domain;
 
 import java.sql.*;
 
-public class UserDao {
+public abstract class UserDao {
     public void add(User user) throws ClassNotFoundException, SQLException {
-        Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/tobi","root","password");
+        Connection c = getConnection();
         PreparedStatement ps = c.prepareStatement("insert into users(username,password) values(?,?)");
         ps.setString(1,user.getUsername());
         ps.setString(2,user.getPassword());
@@ -14,7 +14,7 @@ public class UserDao {
         c.close();
     }
     public User get(String username) throws ClassNotFoundException, SQLException{
-        Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/tobi","root","password");
+        Connection c = getConnection();
         PreparedStatement ps = c.prepareStatement("select * from users where username = ?");
         ps.setString(1,username);
         ResultSet rs = ps.executeQuery();
@@ -27,4 +27,5 @@ public class UserDao {
         c.close();
         return user;
     }
+    public abstract Connection getConnection() throws ClassNotFoundException, SQLException;
 }

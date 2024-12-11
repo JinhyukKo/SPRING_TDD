@@ -2,13 +2,15 @@ package com.example;
 
 import com.example.domain.User;
 import com.example.domain.UserDao;
+import com.example.domain.UserDaoMySQL;
 
 import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args)  throws ClassNotFoundException, SQLException {
+        System.out.println(System.getProperty("java.class.path"));
         User newUser = new User();
-        UserDao userDao = new UserDao();
+        UserDao userDao = new UserDaoMySQL();
 
         newUser.setPassword("password");
         newUser.setUsername("username");
