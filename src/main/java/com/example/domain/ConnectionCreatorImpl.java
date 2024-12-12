@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class ConnectionCreatorImpl implements ConnectionCreator {
     @Override
     public Connection getConnection() throws ClassNotFoundException, SQLException {
-        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/tobi","root","password");
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/tobi", "root", "password");
         return connection;
     }
 }
