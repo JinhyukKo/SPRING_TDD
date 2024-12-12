@@ -3,9 +3,13 @@ package com.example.domain;
 
 import java.sql.*;
 
-public abstract class UserDao {
+public class UserDao {
+    private ConnectionCreator connectionCreator;
+    public UserDao (ConnectionCreator connectionCreator) {
+        this.connectionCreator = connectionCreator;
+    }
     public void add(User user) throws ClassNotFoundException, SQLException {
-        Connection c = getConnection();
+        Connection c = connectionCreator.getConnection();
         PreparedStatement ps = c.prepareStatement("insert into users(username,password) values(?,?)");
         ps.setString(1,user.getUsername());
         ps.setString(2,user.getPassword());
@@ -14,7 +18,7 @@ public abstract class UserDao {
         c.close();
     }
     public User get(String username) throws ClassNotFoundException, SQLException{
-        Connection c = getConnection();
+        Connection c = connectionCreator.getConnection();
         PreparedStatement ps = c.prepareStatement("select * from users where username = ?");
         ps.setString(1,username);
         ResultSet rs = ps.executeQuery();
@@ -27,5 +31,4 @@ public abstract class UserDao {
         c.close();
         return user;
     }
-    public abstract Connection getConnection() throws ClassNotFoundException, SQLException;
 }
