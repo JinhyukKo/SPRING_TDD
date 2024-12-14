@@ -4,11 +4,15 @@ import com.example.domain.CountingConnectionCreatorDecorator;
 import com.example.domain.DaoFactory;
 import com.example.domain.User;
 import com.example.domain.UserDao;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+
 import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UserDaoTest {
     @Test
@@ -23,6 +27,7 @@ public class UserDaoTest {
         //Assert
         userDao.deleteAll();
 
+        assertEquals(userDao.getCount(),0);
         //Act
         assert userDao.getCount()==0 : "deleteAll failed";
 
@@ -59,6 +64,16 @@ public class UserDaoTest {
         assert userDao.getCount()==2 : "add failed";
         userDao.add(user3);
         assert userDao.getCount()==3 : "add failed";
+    }
+    @Test
+    public void getUserFail() throws ClassNotFoundException, SQLException {
+        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+        UserDao userDao = context.getBean("userDao", UserDao.class);
+
+        userDao.deleteAll();
+        assert userDao.getCount()==0 : "deleteAll failed";
+
+        assertThrows(SQLException.class, () -> userDao.get("no such user"));
 
     }
 
