@@ -4,31 +4,44 @@ import com.example.domain.CountingConnectionCreatorDecorator;
 import com.example.domain.DaoFactory;
 import com.example.domain.User;
 import com.example.domain.UserDao;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-
 import java.sql.SQLException;
-
 import static org.junit.jupiter.api.Assertions.*;
 
+
 public class UserDaoTest {
+    UserDao userDao;
+    static ApplicationContext context;
+    User newUser1;
+    User newUser2;
+    User newUser3;
+
+    @BeforeAll
+    public static void setUpContext() {
+        context = new AnnotationConfigApplicationContext(DaoFactory.class);
+    }
+
+    @BeforeEach
+    public void setUp() throws SQLException {
+        this.userDao = context.getBean("userDao", UserDao.class);
+        this.newUser1 = new User("username1","password1");
+        this.newUser2 = new User("username2","password2");
+        this.newUser3 = new User("username3","password3");
+
+    }
+
     @Test
     public void addAndGet()  throws ClassNotFoundException, SQLException {
-        //Arragne
-        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-        UserDao userDao = context.getBean("userDao", UserDao.class);
-        CountingConnectionCreatorDecorator connectionCreator = context.getBean("connectionCreator", CountingConnectionCreatorDecorator.class);
-        User newUser1 = new User("username1","password1");
-        User newUser2 = new User("username2","password2");
-
-        //Assert
+        //Act
         userDao.deleteAll();
 
         assertEquals(userDao.getCount(),0);
-        //Act
+        //Assert
         assert userDao.getCount()==0 : "deleteAll failed";
 
         //Act
@@ -50,26 +63,18 @@ public class UserDaoTest {
     }
     @Test
     public void count()  throws ClassNotFoundException, SQLException {
-        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-        UserDao userDao = context.getBean("userDao", UserDao.class);
-        User user = new User("username1", "password1");
-        User user2 = new User("username2", "password2");
-        User user3 = new User("username3", "password3");
-
         userDao.deleteAll();
+
         assert userDao.getCount()==0 : "deleteAll failed";
-        userDao.add(user);
+        userDao.add(newUser1);
         assert userDao.getCount()==1 : "add failed";
-        userDao.add(user2);
+        userDao.add(newUser2);
         assert userDao.getCount()==2 : "add failed";
-        userDao.add(user3);
+        userDao.add(newUser3);
         assert userDao.getCount()==3 : "add failed";
     }
     @Test
     public void getUserFail() throws ClassNotFoundException, SQLException {
-        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-        UserDao userDao = context.getBean("userDao", UserDao.class);
-
         userDao.deleteAll();
         assert userDao.getCount()==0 : "deleteAll failed";
 
