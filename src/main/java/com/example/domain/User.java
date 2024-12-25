@@ -11,6 +11,10 @@ public class User{
 
     public User() {
     }
+    @Override
+    public boolean equals(Object o) {
+        return this.username.equals(((User)o).username) && this.password.equals(((User)o).password);
+    }
 
 
     public String getUsername(){

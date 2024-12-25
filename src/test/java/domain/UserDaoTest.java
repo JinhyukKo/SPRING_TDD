@@ -95,10 +95,18 @@ public class UserDaoTest {
         userDao.add(newUser1);
         List<User> users =  userDao.getAll();
         assert users.size() == 1 : "get failed";
-        assert users.get(0).equals(User); : "get failed";
+        assert users.get(0).equals(newUser1); : "get failed";
 
         userDao.add(newUser2);
-        assert
+        List<User> users= userDao.getAll();
+        assert users.size() == 2 : "get failed";
+        assert users.get(0).equals(newUser1) : "get failed";
+        assert users.get(1).equals(newUser2) : "get failed";
+        userDao.add(newUser3);
+        assert users.size() == 3 : "get failed";
+        assert users.get(0).equals(newUser1) : "get failed";
+        assert users.get(1).equals(newUser2) : "get failed";
+        assert users.get(2).equals(newUser3) : "get failed";
     }
 
     @Test
