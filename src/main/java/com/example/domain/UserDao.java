@@ -28,23 +28,28 @@ public class UserDao {
     }
 
     public User get(String username) throws ClassNotFoundException, SQLException {
+//        Connection c = connectionCreator.getConnection();
+//        PreparedStatement ps = c.prepareStatement("select * from users where username = ?");
+//        ps.setString(1, username);
+//        ResultSet rs = ps.executeQuery();
 
-        Connection c = connectionCreator.getConnection();
-        PreparedStatement ps = c.prepareStatement("select * from users where username = ?");
-        ps.setString(1, username);
-        ResultSet rs = ps.executeQuery();
-        User user = null;
-        if (rs.next()) {
-            user = new User();
-            user.setUsername(rs.getString("username"));
-            user.setPassword(rs.getString("password"));
-        }
-        rs.close();
-        ps.close();
-        c.close();
-        if (user == null) {
-            throw new SQLException("User not found");
-        }
+//        if (rs.next()) {
+//            user = new User();
+//            user.setUsername(rs.getString("username"));
+//            user.setPassword(rs.getString("password"));
+//        }
+//        rs.close();
+//        ps.close();
+//        c.close();
+//        if (user == null) {
+//            throw new SQLException("User not found");
+//        }
+        User user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE username = ?", new Object[]{username}, (ResultSet rs,int rowNum)->{
+            User newUser =new User();
+            newUser.setUsername(rs.getString("username"));
+            newUser.setPassword(rs.getString("password"));
+            return newUser;
+        });
         return user;
     }
 
@@ -93,6 +98,11 @@ public class UserDao {
 //                }
 //            }
 //        }
+        return jdbcTemplate.query("select count(*) from users",(ResultSet rs)->{
+            rs.next();
+            return rs.getInt(1);
+        });
+
     }
 
     public void jdbcContextWithStatement(StatementStrategy stmt) throws SQLException, ClassNotFoundException {

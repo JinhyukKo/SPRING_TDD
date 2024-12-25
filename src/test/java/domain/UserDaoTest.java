@@ -10,8 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.dao.DataAccessException;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -82,8 +84,21 @@ public class UserDaoTest {
         userDao.deleteAll();
         assert userDao.getCount() == 0 : "deleteAll failed";
 
-        assertThrows(SQLException.class, () -> userDao.get("no such user"));
+        assertThrows(DataAccessException.class, () -> userDao.get("no such user"));
 
+    }
+    @Test
+    public void addAndGetAll() throws ClassNotFoundException, SQLException {
+        userDao.deleteAll();
+        assert userDao.getCount() == 0 : "deleteAll failed";
+
+        userDao.add(newUser1);
+        List<User> users =  userDao.getAll();
+        assert users.size() == 1 : "get failed";
+        assert users.get(0).equals(User); : "get failed";
+
+        userDao.add(newUser2);
+        assert
     }
 
     @Test
@@ -96,5 +111,6 @@ public class UserDaoTest {
         assert userDao.getCount() == 0 : "deleteAll failed";
 
     }
+
 
 }
