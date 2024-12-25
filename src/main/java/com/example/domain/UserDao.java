@@ -2,19 +2,25 @@ package com.example.domain;
 
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
 
 public class UserDao {
-    private ConnectionCreator connectionCreator;
     private JdbcTemplate jdbcTemplate;
+    private RowMapper<User> userRowMapper = (rs, rowNum) -> {
+        User newUser =new User();
+        newUser.setUsername(rs.getString("username"));
+        newUser.setPassword(rs.getString("password"));
+        return newUser;
+    };
 
-    public UserDao(ConnectionCreator connectionCreator, JdbcTemplate jdbcTemplate) {
-        this.connectionCreator = connectionCreator;
+    public UserDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
 
     public void add(User user) throws ClassNotFoundException, SQLException {
 //        jdbcContextWithStatement((connection)->{
@@ -45,21 +51,11 @@ public class UserDao {
 //        if (user == null) {
 //            throw new SQLException("User not found");
 //        }
-        User user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE username = ?", new Object[]{username}, (ResultSet rs,int rowNum)->{
-            User newUser =new User();
-            newUser.setUsername(rs.getString("username"));
-            newUser.setPassword(rs.getString("password"));
-            return newUser;
-        });
+        User user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE username = ?", new Object[]{username},userRowMapper);
         return user;
     }
     public List<User> getAll() throws ClassNotFoundException, SQLException {
-        List<User> users = jdbcTemplate.query("SELECT * FROM users", (ResultSet rs,int rowNum)->{
-            User user = new User();
-            user.setPassword(rs.getString("password"));
-            user.setUsername(rs.getString("username"));
-            return user;
-        });
+        List<User> users = jdbcTemplate.query("SELECT * FROM users", userRowMapper);
         return users;
     }
 
@@ -115,32 +111,32 @@ public class UserDao {
 
     }
 
-    public void jdbcContextWithStatement(StatementStrategy stmt) throws SQLException, ClassNotFoundException {
-        Connection c = null;
-        PreparedStatement ps = null;
-        try {
-            c = connectionCreator.getConnection();
-            ps = stmt.makePreparedStatement(c);
-            ps.executeUpdate();
-        } catch (ClassNotFoundException e) {
-            throw e;
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            if (ps != null) {
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                    throw e;
-                }
-            }
-            if (c != null) {
-                try {
-                    c.close();
-                } catch (SQLException e) {
-                    throw e;
-                }
-            }
-        }
-    }
+//    public void jdbcContextWithStatement(StatementStrategy stmt) throws SQLException, ClassNotFoundException {
+//        Connection c = null;
+//        PreparedStatement ps = null;
+//        try {
+//            c = connectionCreator.getConnection();
+//            ps = stmt.makePreparedStatement(c);
+//            ps.executeUpdate();
+//        } catch (ClassNotFoundException e) {
+//            throw e;
+//        } catch (SQLException e) {
+//            throw e;
+//        } finally {
+//            if (ps != null) {
+//                try {
+//                    ps.close();
+//                } catch (SQLException e) {
+//                    throw e;
+//                }
+//            }
+//            if (c != null) {
+//                try {
+//                    c.close();
+//                } catch (SQLException e) {
+//                    throw e;
+//                }
+//            }
+//        }
+//    }
 }
