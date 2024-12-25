@@ -26,6 +26,16 @@ public class Calculator {
             return sum;
         });
     }
+    public String concat(String filePath) throws  IOException{
+        return fileReadTemplate(filePath, (BufferedReader br)->{
+            String line = "";
+            String newline = "";
+            while ((newline=br.readLine()) != null) {
+                line += newline;
+            }
+            return line;
+        });
+    }
 
     public <T> T fileReadTemplate(String filePath, OperationCallback<T> callback) throws IOException {
         BufferedReader br = null;

@@ -35,6 +35,11 @@ public class SumTest {
         assert value == 3;
     }
     @Test
+    public void testConcat() throws IOException {
+        String value = calculator.concat(filepath2);
+        assert value.equals("12345");
+    }
+    @Test
     public void testMultiply() throws IOException {
         int value = calculator.calcMul(filepath1);
         assert value == 2*3*4*5;
