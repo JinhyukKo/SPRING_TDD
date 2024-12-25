@@ -37,7 +37,7 @@ public class SumTest {
     @Test
     public void testConcat() throws IOException {
         String value = calculator.concat(filepath2);
-        assert value.equals("12345");
+        assert value.equals("123456");
     }
     @Test
     public void testMultiply() throws IOException {

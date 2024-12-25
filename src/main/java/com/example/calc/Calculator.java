@@ -29,7 +29,7 @@ public class Calculator {
     public String concat(String filePath) throws  IOException{
         return fileReadTemplate(filePath, (BufferedReader br)->{
             String line = "";
-            String newline = "";
+            String newline = null;
             while ((newline=br.readLine()) != null) {
                 line += newline;
             }
