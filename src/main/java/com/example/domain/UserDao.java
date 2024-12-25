@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.List;
 
 public class UserDao {
     private ConnectionCreator connectionCreator;
@@ -51,6 +52,15 @@ public class UserDao {
             return newUser;
         });
         return user;
+    }
+    public List<User> getAll() throws ClassNotFoundException, SQLException {
+        List<User> users = jdbcTemplate.query("SELECT * FROM users", (ResultSet rs,int rowNum)->{
+            User user = new User();
+            user.setPassword(rs.getString("password"));
+            user.setUsername(rs.getString("username"));
+            return user;
+        });
+        return users;
     }
 
     public void deleteAll() throws ClassNotFoundException, SQLException {

@@ -90,19 +90,25 @@ public class UserDaoTest {
     @Test
     public void addAndGetAll() throws ClassNotFoundException, SQLException {
         userDao.deleteAll();
+
+        List<User> users = null;
         assert userDao.getCount() == 0 : "deleteAll failed";
 
+        users = userDao.getAll();
+        assert users.size() == 0 : "getAll failed";
+
         userDao.add(newUser1);
-        List<User> users =  userDao.getAll();
+        users = userDao.getAll();
         assert users.size() == 1 : "get failed";
-        assert users.get(0).equals(newUser1); : "get failed";
+        assert users.get(0).equals(newUser1) : "get failed";
 
         userDao.add(newUser2);
-        List<User> users= userDao.getAll();
+        users= userDao.getAll();
         assert users.size() == 2 : "get failed";
         assert users.get(0).equals(newUser1) : "get failed";
         assert users.get(1).equals(newUser2) : "get failed";
         userDao.add(newUser3);
+        users = userDao.getAll();
         assert users.size() == 3 : "get failed";
         assert users.get(0).equals(newUser1) : "get failed";
         assert users.get(1).equals(newUser2) : "get failed";
