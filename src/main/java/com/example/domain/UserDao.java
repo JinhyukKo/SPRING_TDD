@@ -36,7 +36,7 @@ public class UserDao {
 
     }
 
-    public User get(String username) throws ClassNotFoundException, SQLException {
+    public User get(String username) {
 //        Connection c = connectionCreator.getConnection();
 //        PreparedStatement ps = c.prepareStatement("select * from users where username = ?");
 //        ps.setString(1, username);
@@ -57,12 +57,12 @@ public class UserDao {
         return user;
     }
 
-    public List<User> getAll() throws ClassNotFoundException, SQLException {
+    public List<User> getAll() {
         List<User> users = jdbcTemplate.query("SELECT * FROM users", userRowMapper);
         return users;
     }
 
-    public void deleteAll() throws ClassNotFoundException, SQLException {
+    public void deleteAll(){
 //        jdbcContextWithStatement((connection)->{
 //            return connection.prepareStatement("DELETE FROM users");
 //        }
