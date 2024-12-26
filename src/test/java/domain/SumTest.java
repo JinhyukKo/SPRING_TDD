@@ -44,4 +44,5 @@ public class SumTest {
         int value = calculator.calcMul(filepath1);
         assert value == 2*3*4*5;
     }
+
 }

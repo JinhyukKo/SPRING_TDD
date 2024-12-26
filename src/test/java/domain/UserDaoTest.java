@@ -1,9 +1,6 @@
 package domain;
 
-import com.example.domain.CountingConnectionCreatorDecorator;
-import com.example.domain.DaoFactory;
-import com.example.domain.User;
-import com.example.domain.UserDao;
+import com.example.domain.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -123,6 +120,20 @@ public class UserDaoTest {
         //Assert
         assert userDao.getCount() == 0 : "deleteAll failed";
 
+    }
+    @Test
+    public void addDuplicate() throws ClassNotFoundException, SQLException {
+        userDao.deleteAll();
+        userDao.add(newUser1);
+        assertThrows(DuplicateUsernameException.class, () -> userDao.add(newUser1));
+    }
+    @Test
+    public void nullpointer(){
+        User user = null;
+        user.setUsername(null);
+        while(true){
+            System.out.println(1);
+        }
     }
 
 

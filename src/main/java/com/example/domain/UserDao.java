@@ -1,6 +1,9 @@
 package com.example.domain;
 
 
+import com.mysql.cj.exceptions.MysqlErrorNumbers;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -9,29 +12,28 @@ import java.sql.*;
 import java.util.List;
 
 public class UserDao {
-    private JdbcTemplate jdbcTemplate;
+    private JdbcOperations jdbcTemplate;
     private RowMapper<User> userRowMapper = (rs, rowNum) -> {
-        User newUser =new User();
+        User newUser = new User();
         newUser.setUsername(rs.getString("username"));
         newUser.setPassword(rs.getString("password"));
         return newUser;
     };
 
-    public UserDao(JdbcTemplate jdbcTemplate) {
+    public UserDao(JdbcOperations jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
 
-    public void add(User user) throws ClassNotFoundException, SQLException {
-//        jdbcContextWithStatement((connection)->{
-//            PreparedStatement ps = connection.prepareStatement("INSERT INTO users (username, password) VALUES (?, ?)");
-//            ps.setString(1, user.getUsername());
-//            ps.setString(2, user.getPassword());
-//            return ps;
-//        });
-        jdbcTemplate.update("INSERT INTO users (username,password) VALUES (?,?)"
-                , user.getUsername(),
-                user.getPassword());
+    public void add(User user) throws DuplicateUsernameException {
+        try {
+            jdbcTemplate.update("INSERT INTO users (username,password) VALUES (?,?)"
+                    , user.getUsername(),
+                    user.getPassword());
+        } catch (DataAccessException e){
+            throw new DuplicateUsernameException(e);
+        }
+
     }
 
     public User get(String username) throws ClassNotFoundException, SQLException {
@@ -51,9 +53,10 @@ public class UserDao {
 //        if (user == null) {
 //            throw new SQLException("User not found");
 //        }
-        User user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE username = ?", new Object[]{username},userRowMapper);
+        User user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE username = ?", new Object[]{username}, userRowMapper);
         return user;
     }
+
     public List<User> getAll() throws ClassNotFoundException, SQLException {
         List<User> users = jdbcTemplate.query("SELECT * FROM users", userRowMapper);
         return users;
@@ -104,7 +107,7 @@ public class UserDao {
 //                }
 //            }
 //        }
-        return jdbcTemplate.query("select count(*) from users",(ResultSet rs)->{
+        return jdbcTemplate.query("select count(*) from users", (ResultSet rs) -> {
             rs.next();
             return rs.getInt(1);
         });
