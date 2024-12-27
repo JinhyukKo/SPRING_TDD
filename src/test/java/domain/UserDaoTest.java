@@ -28,7 +28,7 @@ public class UserDaoTest {
 
     @BeforeEach
     public void setUp() throws SQLException {
-        this.userDao = context.getBean("userDao", UserDao.class);
+        this.userDao = context.getBean("userDao", UserDaoImpl.class);
         this.newUser1 = new User("username1", "password1");
         this.newUser2 = new User("username2", "password2");
         this.newUser3 = new User("username3", "password3");
@@ -122,19 +122,12 @@ public class UserDaoTest {
 
     }
     @Test
-    public void addDuplicate() throws ClassNotFoundException, SQLException {
+    public void addDuplicate() {
         userDao.deleteAll();
         userDao.add(newUser1);
         assertThrows(DuplicateUsernameException.class, () -> userDao.add(newUser1));
     }
-    @Test
-    public void nullpointer(){
-        User user = null;
-        user.setUsername(null);
-        while(true){
-            System.out.println(1);
-        }
-    }
+
 
 
 }

@@ -6,15 +6,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DriverManager;
 
 @Configuration
 public class DaoFactory {
 
     @Bean
     public UserDao userDao() {
-        UserDao userDao = new UserDao(jdbcTemplate());
+        UserDao userDao = new UserDaoImpl(jdbcTemplate());
         return userDao;
     }
     @Bean
