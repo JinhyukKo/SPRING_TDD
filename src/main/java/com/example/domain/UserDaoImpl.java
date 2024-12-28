@@ -14,6 +14,10 @@ public class UserDaoImpl implements UserDao {
         User newUser = new User();
         newUser.setUsername(rs.getString("username"));
         newUser.setPassword(rs.getString("password"));
+        newUser.setId(rs.getInt("id"));
+        newUser.setLevel(Level.valueOf(rs.getInt("level")));
+        newUser.setRecommend(rs.getInt("recommend"));
+        newUser.setLogin(rs.getInt("login"));
         return newUser;
     };
 
@@ -25,10 +29,15 @@ public class UserDaoImpl implements UserDao {
     @Override
     public void add(User user) throws DuplicateUsernameException {
         try {
-            jdbcTemplate.update("INSERT INTO users (username,password) VALUES (?,?)"
-                    , user.getUsername(),
-                    user.getPassword());
-        } catch (DuplicateKeyException e){
+            jdbcTemplate.update("INSERT INTO users (id,username,password,level,recommend,login) VALUES (?,?,?,?,?,?)"
+                    , user.getId(),
+                    user.getUsername(),
+                    user.getPassword(),
+                    user.getLevel().getValue(),
+                    user.getRecommend(),
+                    user.getLogin()
+            );
+        } catch (DuplicateKeyException e) {
             throw new DuplicateUsernameException(e);
         }
 
@@ -44,8 +53,10 @@ public class UserDaoImpl implements UserDao {
         return users;
     }
 
-    public void deleteAll(){
+    public void deleteAll() {
 //        jdbcContextWithStatement((connection)->{
+
+
 //            return connection.prepareStatement("DELETE FROM users");
 //        }
         jdbcTemplate.update("DELETE FROM users");

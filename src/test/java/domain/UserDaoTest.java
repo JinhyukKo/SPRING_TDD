@@ -32,10 +32,9 @@ public class UserDaoTest {
     @BeforeEach
     public void setUp() throws SQLException {
         this.userDao = context.getBean("userDao", UserDao.class);
-        this.newUser1 = new User("username1", "password1");
-        this.newUser2 = new User("username2", "password2");
-        this.newUser3 = new User("username3", "password3");
-
+        this.newUser1 = new User(1, "username1", "password1", Level.BASIC, 1,0);
+        this.newUser2 = new User(2, "username2", "password2", Level.BASIC, 2,0);
+        this.newUser3 = new User(3, "username3", "password3" , Level.GOLD, 10,0);
     }
 
     @Test
@@ -48,6 +47,8 @@ public class UserDaoTest {
         assert userDao.getCount() == 0 : "deleteAll failed";
 
         //Act
+
+
         userDao.add(newUser1);
         userDao.add(newUser2);
 
@@ -59,6 +60,7 @@ public class UserDaoTest {
         User user2 = userDao.get(newUser2.getUsername());
 
         //Assert
+        assert user.equals(newUser1) : "get failed";
         assert user.getUsername().equals(newUser1.getUsername()) : "get failed";
         assert user.getPassword().equals(newUser1.getPassword()) : "get failed";
         assert user2.getUsername().equals(newUser2.getUsername()) : "get failed";
