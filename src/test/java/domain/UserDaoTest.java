@@ -7,7 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+import org.springframework.jdbc.support.SQLExceptionTranslator;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -28,7 +31,7 @@ public class UserDaoTest {
 
     @BeforeEach
     public void setUp() throws SQLException {
-        this.userDao = context.getBean("userDao", UserDaoImpl.class);
+        this.userDao = context.getBean("userDao", UserDao.class);
         this.newUser1 = new User("username1", "password1");
         this.newUser2 = new User("username2", "password2");
         this.newUser3 = new User("username3", "password3");
@@ -127,6 +130,7 @@ public class UserDaoTest {
         userDao.add(newUser1);
         assertThrows(DuplicateUsernameException.class, () -> userDao.add(newUser1));
     }
+
 
 
 
