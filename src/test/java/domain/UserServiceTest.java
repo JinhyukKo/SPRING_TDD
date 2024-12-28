@@ -77,4 +77,19 @@ public class UserServiceTest {
         User updatedUser = userDao.get(user.getUsername());
         assert updatedUser.getLevel() == level;
     }
+
+    @Test void add(){
+        userDao.deleteAll();
+
+        User userWithoutLevel = users.get(0);
+        User userWithLevel = users.get(4);
+        userWithoutLevel.setLevel(null);
+        userService.add(userWithoutLevel);
+        userService.add(userWithLevel);
+        User userWithoutLevelRead = userDao.get(userWithoutLevel.getUsername());
+        User userWithLevelRead =  userDao.get(userWithLevel.getUsername());
+
+        assert userWithoutLevelRead.getLevel() == Level.BASIC;
+        assert userWithLevel.getLevel() == userWithLevelRead.getLevel();
+    }
 }
