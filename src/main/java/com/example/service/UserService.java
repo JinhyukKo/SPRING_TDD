@@ -15,22 +15,32 @@ public class UserService {
 
     public void upgradeLevels() {
         List<User> users = userDao.getAll();
-        boolean changed = false;
         for (User user : users) {
-            switch (user.getLevel()) {
-                case BASIC:
-                    if (user.getLogin() >= 50) user.setLevel(Level.SILVER);
-                    changed = true;
-                    break;
-                case SILVER:
-                    if (user.getRecommend() >= 30) user.setLevel(Level.GOLD);
-                    changed = true;
-                    break;
-                default:
-                    break;
-            }
-            if (changed) userDao.update(user);
+            if (canUpgradeLevel(user))
+                upgradeLevel(user);
         }
+    }
+
+    private boolean canUpgradeLevel(User user) {
+        switch (user.getLevel()) {
+            case BASIC:
+                return user.getLogin() >= 50;
+            case SILVER:
+                return user.getRecommend()>=30;
+            case GOLD:
+                return false;
+            default:
+                throw new IllegalArgumentException("Unsupported level: " + user.getLevel());
+        }
+    }
+
+    private void upgradeLevel(User user) {
+        if (user.getLevel() == Level.BASIC) {
+            user.setLevel(Level.SILVER);
+        } else if (user.getLevel() == Level.SILVER) {
+            user.setLevel(Level.GOLD);
+        }
+        userDao.update(user);
     }
 
     public void add(User user) {
