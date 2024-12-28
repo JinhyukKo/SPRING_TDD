@@ -29,8 +29,14 @@ public class UserService {
                 default:
                     break;
             }
-            if(changed) userDao.update(user);
+            if (changed) userDao.update(user);
         }
     }
 
+    public void add(User user) {
+        if (user.getLevel() == null) {
+            user.setLevel(Level.BASIC);
+        }
+        userDao.add(user);
+    }
 }
