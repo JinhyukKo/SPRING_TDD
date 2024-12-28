@@ -54,11 +54,6 @@ public class UserDaoImpl implements UserDao {
     }
 
     public void deleteAll() {
-//        jdbcContextWithStatement((connection)->{
-
-
-//            return connection.prepareStatement("DELETE FROM users");
-//        }
         jdbcTemplate.update("DELETE FROM users");
     }
 
@@ -68,6 +63,18 @@ public class UserDaoImpl implements UserDao {
             return rs.getInt(1);
         });
 
+    }
+
+    @Override
+    public void update(User user) {
+        jdbcTemplate.update("UPDATE users set username=?, password=?, level=?, recommend=?, login=? where id=?",
+                user.getUsername(),
+                user.getPassword(),
+                user.getLevel().getValue(),
+                user.getRecommend(),
+                user.getLogin(),
+                user.getId()
+        );
     }
 
 //    public void jdbcContextWithStatement(StatementStrategy stmt) throws SQLException, ClassNotFoundException {

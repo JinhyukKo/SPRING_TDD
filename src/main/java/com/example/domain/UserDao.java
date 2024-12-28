@@ -8,4 +8,5 @@ public User get(String username);
 public void deleteAll();
 public List<User> getAll();
 public int getCount();
+public void update(User user);
 }

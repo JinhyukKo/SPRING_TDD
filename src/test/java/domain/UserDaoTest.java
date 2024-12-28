@@ -47,8 +47,6 @@ public class UserDaoTest {
         assert userDao.getCount() == 0 : "deleteAll failed";
 
         //Act
-
-
         userDao.add(newUser1);
         userDao.add(newUser2);
 
@@ -61,12 +59,29 @@ public class UserDaoTest {
 
         //Assert
         assert user.equals(newUser1) : "get failed";
-        assert user.getUsername().equals(newUser1.getUsername()) : "get failed";
-        assert user.getPassword().equals(newUser1.getPassword()) : "get failed";
-        assert user2.getUsername().equals(newUser2.getUsername()) : "get failed";
-        assert user2.getPassword().equals(newUser2.getPassword()) : "get failed";
+        assert user2.equals(newUser2) : "get failed";
+    }
+    @Test void userEquals(){
+        assert newUser1.equals(newUser1);
+        assert newUser2.equals(newUser2);
+        assert !newUser1.equals(newUser3);
     }
 
+    @Test void update(){
+        userDao.deleteAll();
+        userDao.add(newUser1);
+        userDao.add(newUser2);
+        assert userDao.getCount() == 2 : "update failed";
+        newUser1.setUsername("edited username");
+        newUser1.setPassword("edited password");
+        newUser1.setLevel(Level.GOLD);
+        userDao.update(newUser1);
+        User updatedUser = userDao.get(newUser1.getUsername());
+        User nonUpatedUser = userDao.get(newUser2.getUsername());
+        assert updatedUser.equals(newUser1) : "update failed";
+        assert nonUpatedUser.equals(newUser2) : "update failed";
+
+    }
     @Test
     public void count() throws ClassNotFoundException, SQLException {
         userDao.deleteAll();
