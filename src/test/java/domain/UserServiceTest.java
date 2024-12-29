@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +22,7 @@ public class UserServiceTest {
     static ApplicationContext context;
     List<User> users = new ArrayList<>();
     UserDao userDao;
+
 
     @BeforeAll
     public static void setUpContext() {
