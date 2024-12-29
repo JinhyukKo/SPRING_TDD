@@ -76,6 +76,11 @@ public class User{
         this.recommend = recommend;
     }
     public void upgradeLevel(){
-        this.level= this.level.nextLevel();
+        Level nextLevel = this.level.nextLevel();
+        if(nextLevel != null){
+            this.level=nextLevel;
+        } else{
+            throw new IllegalArgumentException(this.level + "is not upgradable");
+        }
     }
 }
