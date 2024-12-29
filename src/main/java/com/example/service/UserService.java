@@ -8,31 +8,21 @@ import java.util.List;
 
 public class UserService {
     UserDao userDao;
+    UpgradePolicy upgradePolicy;
 
-    public UserService(UserDao userDao) {
+    public UserService(UserDao userDao, UpgradePolicy upgradePolicy) {
         this.userDao = userDao;
+        this.upgradePolicy = upgradePolicy;
     }
 
     public void upgradeLevels() {
         List<User> users = userDao.getAll();
         for (User user : users) {
-            if (canUpgradeLevel(user))
+            if (upgradePolicy.isUpgradable(user))
                 upgradeLevel(user);
         }
     }
 
-    private boolean canUpgradeLevel(User user) {
-        switch (user.getLevel()) {
-            case BASIC:
-                return user.getLogin() >= 50;
-            case SILVER:
-                return user.getRecommend()>=30;
-            case GOLD:
-                return false;
-            default:
-                throw new IllegalArgumentException("Unsupported level: " + user.getLevel());
-        }
-    }
 
     private void upgradeLevel(User user) {
         user.upgradeLevel();

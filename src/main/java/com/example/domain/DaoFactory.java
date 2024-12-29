@@ -1,6 +1,8 @@
 package com.example.domain;
 
+import com.example.service.UpgradePolicy;
 import com.example.service.UserService;
+import com.example.service.UsualUpgradePolicy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,7 +15,11 @@ public class DaoFactory {
 
     @Bean
     public UserService userService() {
-        return new UserService(userDao());
+        return new UserService(userDao(),upgradePolicy());
+    }
+    @Bean
+    public UpgradePolicy upgradePolicy() {
+        return new UsualUpgradePolicy();
     }
     @Bean
     public UserDao userDao() {
