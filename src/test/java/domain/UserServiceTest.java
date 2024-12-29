@@ -5,6 +5,7 @@ import com.example.domain.Level;
 import com.example.domain.User;
 import com.example.domain.UserDao;
 import com.example.service.UserService;
+import com.example.service.UsualUpgradePolicy;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,19 @@ public class UserServiceTest {
     List<User> users = new ArrayList<>();
     UserDao userDao;
 
-
+    static class TestUserService extends UserService {
+        private int id;
+        public TestUserService (int id){
+            this.id = id;
+        }
+        @Override
+        protected void upgradeLevel(User user){
+            if(user.getId() == this.id) throw new UpgradeException();
+            super.upgradeLevel(user);
+        }
+    }
+    static class UpgradeException extends RuntimeException{
+    }
     @BeforeAll
     public static void setUpContext() {
         context = new AnnotationConfigApplicationContext(DaoFactory.class);
@@ -65,13 +78,33 @@ public class UserServiceTest {
             userDao.add(user);
         }
         userService.upgradeLevels();
-
         checkLevel(users.get(0),false);
         checkLevel(users.get(1),true);
         checkLevel(users.get(2),false);
         checkLevel(users.get(3),true);
         checkLevel(users.get(4),false);
 
+    }
+    @Test
+    void upgradeAllOrNothing(){
+        //Arrange
+        UserService testUserService = new TestUserService(users.get(3).getId());
+        testUserService.setUserDao(this.userDao);
+        testUserService.setUpgradePolicy(new UsualUpgradePolicy());
+        userDao.deleteAll();
+        for(User user : users){
+            userDao.add(user);
+        }
+
+
+        try {
+            testUserService.upgradeLevels();//ACT
+            throw new RuntimeException("No Exception thrown");
+        } catch(UpgradeException e) {
+        }
+        checkLevel(users.get(0),false);
+        checkLevel(users.get(1),false);
+        checkLevel(users.get(2),false);
 
 
     }
@@ -84,6 +117,7 @@ public class UserServiceTest {
         }
 
     }
+
 
     @Test void add(){
         userDao.deleteAll();

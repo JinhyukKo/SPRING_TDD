@@ -14,6 +14,9 @@ public class UserService {
         this.userDao = userDao;
         this.upgradePolicy = upgradePolicy;
     }
+    public UserService() {
+
+    }
 
     public void upgradeLevels() {
         List<User> users = userDao.getAll();
@@ -24,9 +27,16 @@ public class UserService {
     }
 
 
-    private void upgradeLevel(User user) {
+    public void setUserDao(UserDao userDao) {
+        this.userDao = userDao;
+    }
+    protected void upgradeLevel(User user) {
         user.upgradeLevel();
         userDao.update(user);
+    }
+
+    public void setUpgradePolicy(UpgradePolicy upgradePolicy) {
+        this.upgradePolicy = upgradePolicy;
     }
 
     public void add(User user) {
