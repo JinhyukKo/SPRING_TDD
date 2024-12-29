@@ -75,4 +75,7 @@ public class User{
     public void setRecommend(int recommend) {
         this.recommend = recommend;
     }
+    public void upgradeLevel(){
+        this.level= this.level.nextLevel();
+    }
 }

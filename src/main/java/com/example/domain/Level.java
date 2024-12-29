@@ -1,11 +1,14 @@
 package com.example.domain;
 
 public enum Level {
-
-    BASIC(1), SILVER(2), GOLD(3) ;
+    GOLD(3,null) ,
+    SILVER(2,GOLD),
+    BASIC(1,SILVER);
     final private int value;
-    Level(int value) {
+    final private Level next;
+    Level(int value,Level next) {
         this.value = value;
+        this.next = next;
     }
     public int getValue() {
         return value;
@@ -17,6 +20,9 @@ public enum Level {
             case 3 : return GOLD;
             default : throw new AssertionError("Invalid Value");
         }
+    }
+    public Level nextLevel() {
+        return this.next;
     }
 
 }
