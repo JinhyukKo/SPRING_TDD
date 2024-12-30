@@ -6,7 +6,9 @@ import com.example.service.UsualUpgradePolicy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 
@@ -15,11 +17,15 @@ public class DaoFactory {
 
     @Bean
     public UserService userService() {
-        return new UserService(userDao(),upgradePolicy());
+        return new UserService(userDao(),upgradePolicy(),transactionManager());
     }
     @Bean
     public UpgradePolicy upgradePolicy() {
         return new UsualUpgradePolicy();
+    }
+    @Bean
+    PlatformTransactionManager transactionManager() {
+        return new DataSourceTransactionManager(dataSource());
     }
     @Bean
     public UserDao userDao() {

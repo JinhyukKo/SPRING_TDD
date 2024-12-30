@@ -9,9 +9,11 @@ import com.example.service.UsualUpgradePolicy;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.transaction.PlatformTransactionManager;
 
 
 import javax.sql.DataSource;
@@ -23,6 +25,8 @@ public class UserServiceTest {
     UserService userService;
     static ApplicationContext context;
     List<User> users = new ArrayList<>();
+
+    PlatformTransactionManager transactionManager;
     UserDao userDao;
     DataSource dataSource ;
 
@@ -49,6 +53,7 @@ public class UserServiceTest {
         userService = context.getBean(UserService.class);
         userDao = context.getBean(UserDao.class);
         dataSource = context.getBean(DataSource.class);
+        transactionManager = context.getBean(PlatformTransactionManager.class);
         users = Arrays.asList(
                 new User(1, "username1", "password1", Level.BASIC, 49, 0),
                 new User(2, "username2", "password2", Level.BASIC, 50, 0),
@@ -76,9 +81,7 @@ public class UserServiceTest {
 
     @Test
     void upgradeLevels() throws Exception {
-        userService.setDataSource(this.dataSource);
         userDao.deleteAll();
-
         for ( User user : users ) {
             userDao.add(user);
         }
@@ -96,7 +99,8 @@ public class UserServiceTest {
         UserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
         testUserService.setUpgradePolicy(new UsualUpgradePolicy());
-        testUserService.setDataSource(this.dataSource);
+        testUserService.setTransactionManager(this.transactionManager);
+
         userDao.deleteAll();
         for(User user : users){
             userDao.add(user);
@@ -106,8 +110,7 @@ public class UserServiceTest {
             testUserService.upgradeLevels();//ACT
             throw new RuntimeException("No Exception thrown");
         } catch(UpgradeException e) {
-            System.out.println("Upgrade Exception lol");
-            e.printStackTrace();
+            System.out.println("Upgrade Exception !");
         }
         checkLevel(users.get(0),false);
         checkLevel(users.get(1),false);
@@ -124,6 +127,7 @@ public class UserServiceTest {
         }
 
     }
+
 
 
     @Test void add(){
