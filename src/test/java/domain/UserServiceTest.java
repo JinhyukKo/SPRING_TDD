@@ -129,6 +129,11 @@ public class UserServiceTest {
     }
 
 
+    @Test
+    void sendMail(){
+        userService.sendEmail();
+    }
+
 
     @Test void add(){
         userDao.deleteAll();

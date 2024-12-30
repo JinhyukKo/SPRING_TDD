@@ -56,33 +56,38 @@ public class UserService {
 
 
     public void sendEmail(){
-        Properties props = new Properties();
-        props.put("mail.smtp.host", "smtp.gmail.com"); // Gmail SMTP 서버
-        props.put("mail.smtp.port", "587");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
+//        Properties props = new Properties();
+//        props.put("mail.smtp.host", "smtp.gmail.com"); // Gmail SMTP 서버
+//        props.put("mail.smtp.port", "587");
+//        props.put("mail.smtp.auth", "true");
+//        props.put("mail.smtp.starttls.enable", "true");
+//        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+//
+//
+//
+//        // Session 객체 생성
+//        Session session = Session.getDefaultInstance(props, new Authenticator() {
+//            protected PasswordAuthentication getPasswordAuthentication() {
+//                return new PasswordAuthentication("kobin1970@gmail.com", "bzqf gpjh hkbf osvj");
+//            }
+//        });
+//
+//        try {
+//            // 메일 생성
+//            Message message = new MimeMessage(session);
+//            message.setFrom(new InternetAddress("kobin1970@gmail.com"));
+//            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("kobin1970@gmail.com"));
+//            message.setSubject("테스트 메일");
+//            message.setText("JavaMail을 이용한 메일 발송 테스트입니다.");
+//
+//            // 메일 전송
+//            Transport.send(message);
+//            System.out.println("메일 전송 완료");
+//        } catch (MessagingException e) {
+//            e.printStackTrace();
+//        }
 
-        // Session 객체 생성
-        Session session = Session.getDefaultInstance(props, new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("kobin1970@gmail.com", "degcak-Godpi8-jatnuj");
-            }
-        });
-
-        try {
-            // 메일 생성
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress("kobin1970@gmail.com"));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("kobin1970@gmail.com"));
-            message.setSubject("테스트 메일");
-            message.setText("JavaMail을 이용한 메일 발송 테스트입니다.");
-
-            // 메일 전송
-            Transport.send(message);
-            System.out.println("메일 전송 완료");
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
+        JavaMailSender
     }
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
