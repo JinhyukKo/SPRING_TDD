@@ -14,6 +14,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +24,7 @@ public class UserServiceTest {
     static ApplicationContext context;
     List<User> users = new ArrayList<>();
     UserDao userDao;
+    DataSource dataSource ;
 
     static class TestUserService extends UserService {
         private int id;
@@ -46,6 +48,7 @@ public class UserServiceTest {
     void setUp() {
         userService = context.getBean(UserService.class);
         userDao = context.getBean(UserDao.class);
+        dataSource = context.getBean(DataSource.class);
         users = Arrays.asList(
                 new User(1, "username1", "password1", Level.BASIC, 49, 0),
                 new User(2, "username2", "password2", Level.BASIC, 50, 0),
@@ -72,8 +75,10 @@ public class UserServiceTest {
     }
 
     @Test
-    void upgradeLevels() {
+    void upgradeLevels() throws Exception {
+        userService.setDataSource(this.dataSource);
         userDao.deleteAll();
+
         for ( User user : users ) {
             userDao.add(user);
         }
@@ -86,21 +91,23 @@ public class UserServiceTest {
 
     }
     @Test
-    void upgradeAllOrNothing(){
+    void upgradeAllOrNothing() throws  Exception {
         //Arrange
         UserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
         testUserService.setUpgradePolicy(new UsualUpgradePolicy());
+        testUserService.setDataSource(this.dataSource);
         userDao.deleteAll();
         for(User user : users){
             userDao.add(user);
         }
 
-
         try {
             testUserService.upgradeLevels();//ACT
             throw new RuntimeException("No Exception thrown");
         } catch(UpgradeException e) {
+            System.out.println("Upgrade Exception lol");
+            e.printStackTrace();
         }
         checkLevel(users.get(0),false);
         checkLevel(users.get(1),false);
@@ -121,7 +128,6 @@ public class UserServiceTest {
 
     @Test void add(){
         userDao.deleteAll();
-
         User userWithoutLevel = users.get(0);
         User userWithLevel = users.get(4);
         userWithoutLevel.setLevel(null);
@@ -129,7 +135,6 @@ public class UserServiceTest {
         userService.add(userWithLevel);
         User userWithoutLevelRead = userDao.get(userWithoutLevel.getUsername());
         User userWithLevelRead =  userDao.get(userWithLevel.getUsername());
-
         assert userWithoutLevelRead.getLevel() == Level.BASIC;
         assert userWithLevel.getLevel() == userWithLevelRead.getLevel();
     }
