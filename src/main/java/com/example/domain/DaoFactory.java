@@ -1,5 +1,6 @@
 package com.example.domain;
 
+import com.example.service.GmailMailSender;
 import com.example.service.UpgradePolicy;
 import com.example.service.UserService;
 import com.example.service.UsualUpgradePolicy;
@@ -8,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.mail.MailSender;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
@@ -17,7 +19,11 @@ public class DaoFactory {
 
     @Bean
     public UserService userService() {
-        return new UserService(userDao(),upgradePolicy(),transactionManager());
+        return new UserService(userDao(),upgradePolicy(),transactionManager(),mailSender());
+    }
+    @Bean
+    public MailSender mailSender(){
+        return new GmailMailSender();
     }
     @Bean
     public UpgradePolicy upgradePolicy() {
