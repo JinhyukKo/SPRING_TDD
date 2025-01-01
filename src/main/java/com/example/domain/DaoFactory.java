@@ -20,7 +20,7 @@ public class DaoFactory {
     }
     @Bean
     public MailSender mailSender(){
-        return new TestSender();
+        return new GmailMailSender();
     }
     @Bean
     public UpgradePolicy upgradePolicy() {

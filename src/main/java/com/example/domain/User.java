@@ -7,14 +7,16 @@ public class User{
     Level level;
     int login;
     int recommend;
+    private String email;
 
-    public User(int id,String username, String password, Level level, int login, int recommend) {
+    public User(int id,String username, String password, Level level, int login, int recommend, String email) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.level = level;
         this.login = login;
         this.recommend = recommend;
+        this.email= email;
     }
 
     public User() {
@@ -26,7 +28,8 @@ public class User{
                 &&  this.level.getValue() == ((User)o).level.getValue()
                 && this.login == ((User)o).login
                 && this.recommend == ((User)o).recommend
-                && this.id == ((User)o).id;
+                && this.id == ((User)o).id
+                && this.email.equals(((User)o).email);
 
     }
 
@@ -82,5 +85,13 @@ public class User{
         } else{
             throw new IllegalArgumentException(this.level + "is not upgradable");
         }
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

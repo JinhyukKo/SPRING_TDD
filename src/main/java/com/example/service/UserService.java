@@ -26,6 +26,8 @@ public class UserService {
     MailSender mailSender;
 
 
+
+
     public UserService(UserDao userDao, UpgradePolicy upgradePolicy, PlatformTransactionManager transactionManager,MailSender mailSender) {
         this.userDao = userDao;
         this.upgradePolicy = upgradePolicy;
@@ -56,13 +58,13 @@ public class UserService {
     }
 
 
-    public void sendEmail() {
+    public void sendUpgradeEmail(User user) {
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo("kobin1970@gmail.com");
+        mailMessage.setTo(user.getEmail());
         mailMessage.setFrom("kobin1970@gmail.com");
-        mailMessage.setSubject("테스트메일이거든요");
-        mailMessage.setText("테스트입니다.ㅋ");
+        mailMessage.setSubject("사용자님의 등급이 " + user.getLevel().name() + "로 업그레이드 됐습니다.");
+        mailMessage.setText("축하드립니다.");
 
         mailSender.send(mailMessage);
 
@@ -76,6 +78,7 @@ public class UserService {
     protected void upgradeLevel(User user) {
         user.upgradeLevel();
         userDao.update(user);
+        sendUpgradeEmail(user);
     }
 
     public void setUpgradePolicy(UpgradePolicy upgradePolicy) {
@@ -88,4 +91,12 @@ public class UserService {
         }
         userDao.add(user);
     }
+    public MailSender getMailSender() {
+        return mailSender;
+    }
+
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
 }

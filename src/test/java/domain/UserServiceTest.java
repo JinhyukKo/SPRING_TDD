@@ -4,6 +4,7 @@ import com.example.domain.DaoFactory;
 import com.example.domain.Level;
 import com.example.domain.User;
 import com.example.domain.UserDao;
+import com.example.service.TestSender;
 import com.example.service.UserService;
 import com.example.service.UsualUpgradePolicy;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.mail.MailException;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.transaction.PlatformTransactionManager;
 
 
@@ -41,6 +45,26 @@ public class UserServiceTest {
             super.upgradeLevel(user);
         }
     }
+
+
+    static class TestSender implements MailSender {
+        List<String> requests = new ArrayList<>();
+        @Override
+        public void send(SimpleMailMessage... simpleMessages) throws MailException {
+        }
+        @Override
+        public void send(SimpleMailMessage simpleMessage) throws MailException {
+            SimpleMailMessage message = simpleMessage;
+            String request = message.getTo()[0];
+            requests.add(request);
+        }
+
+        public List<String> getRequests() {
+            return requests;
+        }
+
+
+    }
     static class UpgradeException extends RuntimeException{
     }
     @BeforeAll
@@ -54,12 +78,13 @@ public class UserServiceTest {
         userDao = context.getBean(UserDao.class);
         dataSource = context.getBean(DataSource.class);
         transactionManager = context.getBean(PlatformTransactionManager.class);
+        userService.setMailSender(new TestSender());
         users = Arrays.asList(
-                new User(1, "username1", "password1", Level.BASIC, 49, 0),
-                new User(2, "username2", "password2", Level.BASIC, 50, 0),
-                new User(3, "username3", "password2", Level.SILVER, 50, 20),
-                new User(4, "username4", "password2", Level.SILVER, 50, 30),
-                new User(5, "username5", "password3", Level.GOLD, 20, 30)
+                new User(1, "username1", "password1", Level.BASIC, 49, 0, "username1@gmail.com"),
+                new User(2, "username2", "password2", Level.BASIC, 50, 0,"username2@gmail.com"),
+                new User(3, "username3", "password2", Level.SILVER, 50, 20,"username3@gmail.com"),
+                new User(4, "username4", "password2", Level.SILVER, 50, 30,"username4@gmail.com"),
+                new User(5, "username5", "password3", Level.GOLD, 20, 30,"username5@gmail.com")
         );
 
     }
@@ -92,6 +117,18 @@ public class UserServiceTest {
         checkLevel(users.get(3),true);
         checkLevel(users.get(4),false);
 
+        TestSender testSender = (TestSender) userService.getMailSender();
+        List<String> emails = testSender.getRequests();
+        System.out.println(users.get(1).getEmail() + emails.get(0));
+
+
+        String req_email = testSender.getRequests().get(0);
+
+        assert users.get(1).getEmail().equals(emails.get(0));
+        assert users.get(3).getEmail().equals(emails.get(1));
+
+
+
     }
     @Test
     void upgradeAllOrNothing() throws  Exception {
@@ -100,6 +137,7 @@ public class UserServiceTest {
         testUserService.setUserDao(this.userDao);
         testUserService.setUpgradePolicy(new UsualUpgradePolicy());
         testUserService.setTransactionManager(this.transactionManager);
+        testUserService.setMailSender(new TestSender());
 
         userDao.deleteAll();
         for(User user : users){
@@ -115,6 +153,12 @@ public class UserServiceTest {
         checkLevel(users.get(0),false);
         checkLevel(users.get(1),false);
         checkLevel(users.get(2),false);
+        checkLevel(users.get(3),false);
+        checkLevel(users.get(4),false);
+
+        TestSender testSender = (TestSender) testUserService.getMailSender();
+        List<String> emails = testSender.getRequests();
+        assert emails.size() == 0;
 
 
     }
@@ -131,7 +175,12 @@ public class UserServiceTest {
 
     @Test
     void sendMail(){
-        userService.sendEmail();
+        userService.sendUpgradeEmail(users.get(0));
+        TestSender testSender=  (TestSender) userService.getMailSender();
+        System.out.println(testSender.getRequests().get(0));
+        System.out.println(users.get(0).getEmail());
+        String req_email = testSender.getRequests().get(0);
+        assert req_email.equals(users.get(0).getEmail());
     }
 
 

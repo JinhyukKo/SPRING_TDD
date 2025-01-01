@@ -18,6 +18,7 @@ public class UserDaoImpl implements UserDao {
         newUser.setLevel(Level.valueOf(rs.getInt("level")));
         newUser.setRecommend(rs.getInt("recommend"));
         newUser.setLogin(rs.getInt("login"));
+        newUser.setEmail(rs.getString("email"));
         return newUser;
     };
 
@@ -29,13 +30,15 @@ public class UserDaoImpl implements UserDao {
     @Override
     public void add(User user) throws DuplicateUsernameException {
         try {
-            jdbcTemplate.update("INSERT INTO users (id,username,password,level,recommend,login) VALUES (?,?,?,?,?,?)"
+            jdbcTemplate.update("INSERT INTO users (id,username,password,level,recommend,login,email) VALUES (?,?,?,?,?,?,?)"
                     , user.getId(),
                     user.getUsername(),
                     user.getPassword(),
                     user.getLevel().getValue(),
                     user.getRecommend(),
-                    user.getLogin()
+                    user.getLogin(),
+                    user.getEmail()
+
             );
         } catch (DuplicateKeyException e) {
             throw new DuplicateUsernameException(e);
@@ -67,12 +70,13 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void update(User user) {
-        jdbcTemplate.update("UPDATE users set username=?, password=?, level=?, recommend=?, login=? where id=?",
+        jdbcTemplate.update("UPDATE users set username=?, password=?, level=?, recommend=?, login=? ,email=? where id=?",
                 user.getUsername(),
                 user.getPassword(),
                 user.getLevel().getValue(),
                 user.getRecommend(),
                 user.getLogin(),
+                user.getEmail(),
                 user.getId()
         );
     }

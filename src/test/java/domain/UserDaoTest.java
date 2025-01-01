@@ -32,9 +32,9 @@ public class UserDaoTest {
     @BeforeEach
     public void setUp() throws SQLException {
         this.userDao = context.getBean("userDao", UserDao.class);
-        this.newUser1 = new User(1, "username1", "password1", Level.BASIC, 1,0);
-        this.newUser2 = new User(2, "username2", "password2", Level.BASIC, 2,0);
-        this.newUser3 = new User(3, "username3", "password3" , Level.GOLD, 10,0);
+        this.newUser1 = new User(1, "username1", "password1", Level.BASIC, 1,0,"username1@gmail.com");
+        this.newUser2 = new User(2, "username2", "password2", Level.BASIC, 2,0,"username2@gmail.com");
+        this.newUser3 = new User(3, "username3", "password3" , Level.GOLD, 10,0,"username3@gmail.com");
     }
 
     @Test
