@@ -1,9 +1,6 @@
 package com.example.domain;
 
-import com.example.service.GmailMailSender;
-import com.example.service.UpgradePolicy;
-import com.example.service.UserService;
-import com.example.service.UsualUpgradePolicy;
+import com.example.service.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,7 +20,7 @@ public class DaoFactory {
     }
     @Bean
     public MailSender mailSender(){
-        return new GmailMailSender();
+        return new TestSender();
     }
     @Bean
     public UpgradePolicy upgradePolicy() {
