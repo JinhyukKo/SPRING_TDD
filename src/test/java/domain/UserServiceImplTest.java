@@ -4,16 +4,13 @@ import com.example.domain.DaoFactory;
 import com.example.domain.Level;
 import com.example.domain.User;
 import com.example.domain.UserDao;
-import com.example.service.TestSender;
-import com.example.service.UserService;
+import com.example.service.UserServiceImpl;
 import com.example.service.UsualUpgradePolicy;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -25,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class UserServiceTest {
-    UserService userService;
+public class UserServiceImplTest {
+    UserServiceImpl userServiceImpl;
     static ApplicationContext context;
     List<User> users = new ArrayList<>();
 
@@ -34,9 +31,9 @@ public class UserServiceTest {
     UserDao userDao;
     DataSource dataSource ;
 
-    static class TestUserService extends UserService {
+    static class TestUserServiceImpl extends UserServiceImpl {
         private int id;
-        public TestUserService (int id){
+        public TestUserServiceImpl(int id){
             this.id = id;
         }
         @Override
@@ -74,11 +71,11 @@ public class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userService = context.getBean(UserService.class);
+        userServiceImpl = context.getBean(UserServiceImpl.class);
         userDao = context.getBean(UserDao.class);
         dataSource = context.getBean(DataSource.class);
         transactionManager = context.getBean(PlatformTransactionManager.class);
-        userService.setMailSender(new TestSender());
+        userServiceImpl.setMailSender(new TestSender());
         users = Arrays.asList(
                 new User(1, "username1", "password1", Level.BASIC, 49, 0, "username1@gmail.com"),
                 new User(2, "username2", "password2", Level.BASIC, 50, 0,"username2@gmail.com"),
@@ -92,14 +89,14 @@ public class UserServiceTest {
     @Test
     void isthesameInstace() {
         System.out.println(this);
-        System.out.println(userService);
+        System.out.println(userServiceImpl);
         System.out.println(context);
     }
 
     @Test
     void isthesameInstace2() {
         System.out.println(this);
-        System.out.println(userService);
+        System.out.println(userServiceImpl);
         System.out.println(context);
 
     }
@@ -110,14 +107,14 @@ public class UserServiceTest {
         for ( User user : users ) {
             userDao.add(user);
         }
-        userService.upgradeLevels();
+        userServiceImpl.upgradeLevels();
         checkLevel(users.get(0),false);
         checkLevel(users.get(1),true);
         checkLevel(users.get(2),false);
         checkLevel(users.get(3),true);
         checkLevel(users.get(4),false);
 
-        TestSender testSender = (TestSender) userService.getMailSender();
+        TestSender testSender = (TestSender) userServiceImpl.getMailSender();
         List<String> emails = testSender.getRequests();
         System.out.println(users.get(1).getEmail() + emails.get(0));
 
@@ -133,11 +130,11 @@ public class UserServiceTest {
     @Test
     void upgradeAllOrNothing() throws  Exception {
         //Arrange
-        UserService testUserService = new TestUserService(users.get(3).getId());
-        testUserService.setUserDao(this.userDao);
-        testUserService.setUpgradePolicy(new UsualUpgradePolicy());
-        testUserService.setTransactionManager(this.transactionManager);
-        testUserService.setMailSender(new TestSender());
+        UserServiceImpl testUserServiceImpl = new TestUserServiceImpl(users.get(3).getId());
+        testUserServiceImpl.setUserDao(this.userDao);
+        testUserServiceImpl.setUpgradePolicy(new UsualUpgradePolicy());
+        testUserServiceImpl.setTransactionManager(this.transactionManager);
+        testUserServiceImpl.setMailSender(new TestSender());
 
         userDao.deleteAll();
         for(User user : users){
@@ -145,7 +142,7 @@ public class UserServiceTest {
         }
 
         try {
-            testUserService.upgradeLevels();//ACT
+            testUserServiceImpl.upgradeLevels();//ACT
             throw new RuntimeException("No Exception thrown");
         } catch(UpgradeException e) {
             System.out.println("Upgrade Exception !");
@@ -156,7 +153,7 @@ public class UserServiceTest {
         checkLevel(users.get(3),false);
         checkLevel(users.get(4),false);
 
-        TestSender testSender = (TestSender) testUserService.getMailSender();
+        TestSender testSender = (TestSender) testUserServiceImpl.getMailSender();
         List<String> emails = testSender.getRequests();
         assert emails.size() == 0;
 
@@ -175,8 +172,8 @@ public class UserServiceTest {
 
     @Test
     void sendMail(){
-        userService.sendUpgradeEmail(users.get(0));
-        TestSender testSender=  (TestSender) userService.getMailSender();
+        userServiceImpl.sendUpgradeEmail(users.get(0));
+        TestSender testSender=  (TestSender) userServiceImpl.getMailSender();
         System.out.println(testSender.getRequests().get(0));
         System.out.println(users.get(0).getEmail());
         String req_email = testSender.getRequests().get(0);
@@ -189,8 +186,8 @@ public class UserServiceTest {
         User userWithoutLevel = users.get(0);
         User userWithLevel = users.get(4);
         userWithoutLevel.setLevel(null);
-        userService.add(userWithoutLevel);
-        userService.add(userWithLevel);
+        userServiceImpl.add(userWithoutLevel);
+        userServiceImpl.add(userWithLevel);
         User userWithoutLevelRead = userDao.get(userWithoutLevel.getUsername());
         User userWithLevelRead =  userDao.get(userWithLevel.getUsername());
         assert userWithoutLevelRead.getLevel() == Level.BASIC;

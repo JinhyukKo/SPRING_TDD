@@ -15,8 +15,8 @@ import javax.sql.DataSource;
 public class DaoFactory {
 
     @Bean
-    public UserService userService() {
-        return new UserService(userDao(),upgradePolicy(),transactionManager(),mailSender());
+    public UserServiceImpl userService() {
+        return new UserServiceImpl(userDao(),upgradePolicy(),transactionManager(),mailSender());
     }
     @Bean
     public MailSender mailSender(){
