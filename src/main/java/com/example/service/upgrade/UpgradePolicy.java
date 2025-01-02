@@ -1,4 +1,4 @@
-package com.example.service;
+package com.example.service.upgrade;
 
 import com.example.domain.User;
 

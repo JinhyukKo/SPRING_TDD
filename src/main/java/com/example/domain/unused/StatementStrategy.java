@@ -1,4 +1,4 @@
-package com.example.domain;
+package com.example.domain.unused;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -1,5 +1,6 @@
 package domain;
 
+import com.example.AppConfig;
 import com.example.domain.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,10 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
-import org.springframework.jdbc.support.SQLExceptionTranslator;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -26,7 +24,7 @@ public class UserDaoTest {
 
     @BeforeAll
     public static void setUpContext() {
-        context = new AnnotationConfigApplicationContext(DaoFactory.class);
+        context = new AnnotationConfigApplicationContext(AppConfig.class);
     }
 
     @BeforeEach

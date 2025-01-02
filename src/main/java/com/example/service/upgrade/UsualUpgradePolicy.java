@@ -1,10 +1,11 @@
-package com.example.service;
+package com.example.service.upgrade;
 
 import com.example.domain.User;
 
-public class ChristmasUpgradePolicy implements UpgradePolicy {
-    final static int MIN_LOGIN_COUNT_FOR_SILVER = 10;
-    final static int MIN_RECOMMEND_COUNT_FOR_GOLD= 10;
+public class UsualUpgradePolicy implements UpgradePolicy {
+
+final static int MIN_LOGIN_COUNT_FOR_SILVER = 50;
+final static int MIN_RECOMMEND_COUNT_FOR_GOLD= 30;
     @Override
     public boolean isUpgradable(User user) {
         return switch (user.getLevel()) {

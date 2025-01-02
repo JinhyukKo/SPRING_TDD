@@ -1,12 +1,12 @@
 package domain;
 
-import com.example.domain.DaoFactory;
+import com.example.AppConfig;
 import com.example.domain.Level;
 import com.example.domain.User;
 import com.example.domain.UserDao;
 import com.example.service.UserServiceImpl;
 import com.example.service.UserServiceTx;
-import com.example.service.UsualUpgradePolicy;
+import com.example.service.upgrade.UsualUpgradePolicy;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,7 +67,7 @@ public class UserServiceImplTest {
     }
     @BeforeAll
     public static void setUpContext() {
-        context = new AnnotationConfigApplicationContext(DaoFactory.class);
+        context = new AnnotationConfigApplicationContext(AppConfig.class);
     }
 
     @BeforeEach

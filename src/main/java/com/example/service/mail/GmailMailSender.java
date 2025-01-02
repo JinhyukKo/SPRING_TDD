@@ -1,6 +1,5 @@
-package com.example.service;
+package com.example.service.mail;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;

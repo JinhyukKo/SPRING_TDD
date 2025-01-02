@@ -1,6 +1,10 @@
-package com.example.domain;
+package com.example;
 
+import com.example.domain.*;
 import com.example.service.*;
+import com.example.service.mail.GmailMailSender;
+import com.example.service.upgrade.UpgradePolicy;
+import com.example.service.upgrade.UsualUpgradePolicy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,7 +16,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 
 @Configuration
-public class DaoFactory {
+public class AppConfig {
 
     @Bean
     public UserServiceImpl userServiceImpl() {

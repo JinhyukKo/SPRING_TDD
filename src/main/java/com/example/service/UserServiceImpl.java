@@ -4,12 +4,9 @@ import com.example.domain.Level;
 import com.example.domain.User;
 import com.example.domain.UserDao;
 
+import com.example.service.upgrade.UpgradePolicy;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.transaction.PlatformTransactionManager;
-
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
 
