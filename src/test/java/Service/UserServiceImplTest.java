@@ -1,4 +1,4 @@
-package domain;
+package Service;
 
 import com.example.AppConfig;
 import com.example.domain.Level;
