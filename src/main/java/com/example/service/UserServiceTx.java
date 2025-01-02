@@ -13,6 +13,10 @@ public class UserServiceTx implements UserService {
     PlatformTransactionManager transactionManager;
 
 
+    public UserServiceTx(PlatformTransactionManager transactionManager, UserService userService) {
+        this.transactionManager = transactionManager;
+        this.userService = userService;
+    }
 
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
@@ -35,12 +39,6 @@ public class UserServiceTx implements UserService {
 
     @Override
     public void add(User user) {
-        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
-        try {
-            userService.upgradeLevels();
-            transactionManager.commit(status);
-        } catch (RuntimeException e) {
-            transactionManager.rollback(status);
-            throw e;
-        }    }
+        userService.add(user);
+    }
 }

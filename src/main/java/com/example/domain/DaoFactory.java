@@ -15,9 +15,14 @@ import javax.sql.DataSource;
 public class DaoFactory {
 
     @Bean
-    public UserServiceImpl userService() {
-        return new UserServiceImpl(userDao(),upgradePolicy(),transactionManager(),mailSender());
+    public UserServiceImpl userServiceImpl() {
+        return new UserServiceImpl(userDao(),upgradePolicy(),mailSender());
     }
+    @Bean
+    public UserService userService() {
+        return new UserServiceTx(transactionManager(),userServiceImpl());
+    }
+
     @Bean
     public MailSender mailSender(){
         return new GmailMailSender();
