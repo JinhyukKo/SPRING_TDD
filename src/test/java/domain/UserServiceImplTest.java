@@ -76,7 +76,7 @@ public class UserServiceImplTest {
         userDao = context.getBean(UserDao.class);
         dataSource = context.getBean(DataSource.class);
         transactionManager = context.getBean(PlatformTransactionManager.class);
-        userServiceImpl.setMailSender(new TestSender());
+//        userServiceImpl.setMailSender(new ());
         users = Arrays.asList(
                 new User(1, "username1", "password1", Level.BASIC, 49, 0, "username1@gmail.com"),
                 new User(2, "username2", "password2", Level.BASIC, 50, 0,"username2@gmail.com"),

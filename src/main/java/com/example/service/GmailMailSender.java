@@ -17,7 +17,7 @@ public class GmailMailSender implements MailSender {
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
         mailSender.setUsername("kobin1970@gmail.com");
-        mailSender.setPassword("bzqf gpjh hkbf osvj"); // Use an app-specific password
+        mailSender.setPassword(System.getenv("GMAIL_APP_PASSWORD")); // Use an app-specific password
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.smtp.auth", "true");
