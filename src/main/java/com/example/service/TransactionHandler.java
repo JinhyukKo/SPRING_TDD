@@ -38,7 +38,7 @@ public class TransactionHandler implements InvocationHandler {
             return ret;
         } catch (InvocationTargetException e) {
             transactionManager.rollback(status);
-            throw e;
+            throw e.getTargetException();
         }
     }
 }

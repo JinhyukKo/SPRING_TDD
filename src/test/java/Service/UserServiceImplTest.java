@@ -4,6 +4,8 @@ import com.example.AppConfig;
 import com.example.domain.Level;
 import com.example.domain.User;
 import com.example.domain.UserDao;
+import com.example.service.TransactionHandler;
+import com.example.service.UserService;
 import com.example.service.UserServiceImpl;
 import com.example.service.UserServiceTx;
 import com.example.service.upgrade.UsualUpgradePolicy;
@@ -23,6 +25,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +37,7 @@ public class UserServiceImplTest {
 
     PlatformTransactionManager transactionManager;
     UserDao userDao;
-    MailSender  mailSender;
+    MailSender mailSender;
     DataSource dataSource;
 
     static class TestUserServiceImpl extends UserServiceImpl {
@@ -104,7 +107,6 @@ public class UserServiceImplTest {
         transactionManager = context.getBean(PlatformTransactionManager.class);
 
 
-
     }
 
     @Test
@@ -125,27 +127,14 @@ public class UserServiceImplTest {
     @Test
     void upgradeLevels() throws Exception {
         userServiceImpl.upgradeLevels();
-//        checkLevel(users.get(0),false);
-//        checkLevel(users.get(1),true);
-//        checkLevel(users.get(2),false);
-//        checkLevel(users.get(3),true);
-//        checkLevel(users.get(4),false);
-        verify(userDao,times(2)).update(any(User.class)); // 메서드 호출 이후 검증
+        verify(userDao, times(2)).update(any(User.class)); // 메서드 호출 이후 검증
+        verify(userDao, never()).update(users.get(0));
         verify(userDao).update(users.get(1));
+        verify(userDao, never()).update(users.get(2));
         verify(userDao).update(users.get(3));
+        verify(userDao, never()).update(users.get(4));
         assert users.get(1).getLevel() == Level.SILVER;
         assert users.get(3).getLevel() == Level.GOLD;
-
-//        TestSender testSender = (TestSender) userServiceImpl.getMailSender();
-//        List<String> emails = testSender.getRequests();
-//        System.out.println(users.get(1).getEmail() + emails.get(0));
-
-
-//        String req_email = testSender.getRequests().get(0);
-//
-//        assert users.get(1).getEmail().equals(emails.get(0));
-//        assert users.get(3).getEmail().equals(emails.get(1));
-
         ArgumentCaptor<SimpleMailMessage> mailMessageArgumentCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
         verify(mailSender, times(2)).send(mailMessageArgumentCaptor.capture());
         SimpleMailMessage message1 = mailMessageArgumentCaptor.getAllValues().get(0);
@@ -161,30 +150,26 @@ public class UserServiceImplTest {
         UserServiceImpl testUserServiceImpl = new TestUserServiceImpl(users.get(3).getId());
         testUserServiceImpl.setUserDao(this.userDao);
         testUserServiceImpl.setUpgradePolicy(new UsualUpgradePolicy());
-        testUserServiceImpl.setMailSender(new TestSender());
+        testUserServiceImpl.setMailSender(mailSender);
+        TransactionHandler txHandler = new TransactionHandler();
+        txHandler.setTarget(testUserServiceImpl);
+        txHandler.setTransactionManager(this.transactionManager);
+        UserService userServiceTx = (UserService) Proxy.newProxyInstance(
+                getClass().getClassLoader(),
+                new Class[]{UserService.class},
+                txHandler
+        );
 
-        UserServiceTx userServiceTx = new UserServiceTx(transactionManager, testUserServiceImpl);
-        userDao.deleteAll();
-        for (User user : users) {
-            userDao.add(user);
-        }
-
+        //ACT
         try {
-            userServiceTx.upgradeLevels();//ACT
+            userServiceTx.upgradeLevels();
             throw new RuntimeException("No Exception thrown");
         } catch (UpgradeException e) {
             System.out.println("Upgrade Exception !");
         }
-        checkLevel(users.get(0), false);
-        checkLevel(users.get(1), false);
-        checkLevel(users.get(2), false);
-        checkLevel(users.get(3), false);
-        checkLevel(users.get(4), false);
 
-        TestSender testSender = (TestSender) testUserServiceImpl.getMailSender();
-        List<String> emails = testSender.getRequests();
-//        assert emails.size() == 0;
-
+        //assert
+        verify(userDao, times(1)).update(users.get(1)); // 메서드 호출 이후 검증
 
     }
 

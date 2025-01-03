@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- UserServiceImpl 빈 -->
+    <bean id="userServiceImpl" class="com.example.UserServiceImpl">
+        <constructor-arg ref="userDao" />
+        <constructor-arg ref="upgradePolicy" />
+        <constructor-arg ref="mailSender" />
+    </bean>
+
+    <!-- UserServiceTx 빈 -->
+    <bean id="userService" class="com.example.UserServiceTx">
+        <constructor-arg ref="transactionManager" />
+        <constructor-arg ref="userServiceImpl" />
+    </bean>
+
+    <!-- MailSender 빈 -->
+    <bean id="mailSender" class="com.example.GmailMailSender" />
+
+    <!-- UpgradePolicy 빈 -->
+    <bean id="upgradePolicy" class="com.example.UsualUpgradePolicy" />
+
+    <!-- PlatformTransactionManager 빈 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!-- UserDao 빈 -->
+    <bean id="userDao" class="com.example.UserDaoImpl">
+        <constructor-arg ref="jdbcTemplate" />
+    </bean>
+
+    <!-- ConnectionCreator 빈 -->
+    <bean id="connectionCreator" class="com.example.CountingConnectionCreatorDecorator">
+        <constructor-arg ref="realConnectionCreator" />
+    </bean>
+
+    <!-- Real ConnectionCreator 빈 -->
+    <bean id="realConnectionCreator" class="com.example.ConnectionCreatorImpl" />
+
+    <!-- DataSource 빈 -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/tobi" />
+        <property name="username" value="root" />
+        <property name="password" value="password" />
+    </bean>
+
+    <!-- JdbcTemplate 빈 -->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg ref="dataSource" />
+    </bean>
+
+</beans>
