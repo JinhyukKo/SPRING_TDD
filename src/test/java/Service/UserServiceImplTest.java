@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
 
+import org.mockito.ArgumentCaptor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.mail.MailException;
@@ -21,6 +22,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +34,7 @@ public class UserServiceImplTest {
 
     PlatformTransactionManager transactionManager;
     UserDao userDao;
+    MailSender  mailSender;
     DataSource dataSource;
 
     static class TestUserServiceImpl extends UserServiceImpl {
@@ -89,9 +92,13 @@ public class UserServiceImplTest {
         );
         userServiceImpl = context.getBean(UserServiceImpl.class);
         userDao = mock(UserDao.class);
+
         when(userDao.getAll()).thenReturn(this.users);
         userServiceImpl.setUserDao(userDao);
-        userServiceImpl.setMailSender(new TestSender());
+//        userServiceImpl.setMailSender(new TestSender());
+        mailSender = mock(MailSender.class);
+        userServiceImpl.setMailSender(mailSender);
+
 
         dataSource = context.getBean(DataSource.class);
         transactionManager = context.getBean(PlatformTransactionManager.class);
@@ -129,16 +136,22 @@ public class UserServiceImplTest {
         assert users.get(1).getLevel() == Level.SILVER;
         assert users.get(3).getLevel() == Level.GOLD;
 
-        TestSender testSender = (TestSender) userServiceImpl.getMailSender();
-        List<String> emails = testSender.getRequests();
-        System.out.println(users.get(1).getEmail() + emails.get(0));
+//        TestSender testSender = (TestSender) userServiceImpl.getMailSender();
+//        List<String> emails = testSender.getRequests();
+//        System.out.println(users.get(1).getEmail() + emails.get(0));
 
 
-        String req_email = testSender.getRequests().get(0);
+//        String req_email = testSender.getRequests().get(0);
+//
+//        assert users.get(1).getEmail().equals(emails.get(0));
+//        assert users.get(3).getEmail().equals(emails.get(1));
 
-        assert users.get(1).getEmail().equals(emails.get(0));
-        assert users.get(3).getEmail().equals(emails.get(1));
-
+        ArgumentCaptor<SimpleMailMessage> mailMessageArgumentCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+        verify(mailSender, times(2)).send(mailMessageArgumentCaptor.capture());
+        SimpleMailMessage message1 = mailMessageArgumentCaptor.getAllValues().get(0);
+        SimpleMailMessage message2 = mailMessageArgumentCaptor.getAllValues().get(1);
+        assert message1.getTo()[0].equals(users.get(1).getEmail());
+        assert message2.getTo()[0].equals(users.get(3).getEmail());
 
     }
 
@@ -189,11 +202,10 @@ public class UserServiceImplTest {
     @Test
     void sendMail() {
         userServiceImpl.sendUpgradeEmail(users.get(0));
-        TestSender testSender = (TestSender) userServiceImpl.getMailSender();
-        System.out.println(testSender.getRequests().get(0));
-        System.out.println(users.get(0).getEmail());
-        String req_email = testSender.getRequests().get(0);
-        assert req_email.equals(users.get(0).getEmail());
+        ArgumentCaptor<SimpleMailMessage> mailMessageArgumentCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+        verify(mailSender, times(1)).send(mailMessageArgumentCaptor.capture());
+        SimpleMailMessage simpleMailMessage = mailMessageArgumentCaptor.getAllValues().get(0);
+        assert simpleMailMessage.getTo()[0].equals(users.get(0).getEmail());
     }
 
 
