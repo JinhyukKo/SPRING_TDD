@@ -18,6 +18,7 @@ import static org.mockito.Mockito.*;
 import org.mockito.ArgumentCaptor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -81,7 +82,8 @@ public class UserServiceImplTest {
 
     @BeforeAll
     public static void setUpContext() {
-        context = new AnnotationConfigApplicationContext(AppConfig.class);
+//        context = new AnnotationConfigApplicationContext(AppConfig.class);
+        context =  new ClassPathXmlApplicationContext("applicationContext.xml");
     }
 
     @BeforeEach

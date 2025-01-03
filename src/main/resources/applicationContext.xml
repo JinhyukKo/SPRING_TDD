@@ -5,23 +5,23 @@
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!-- UserServiceImpl 빈 -->
-    <bean id="userServiceImpl" class="com.example.UserServiceImpl">
+    <bean id="userServiceImpl" class="com.example.service.UserServiceImpl">
         <constructor-arg ref="userDao" />
         <constructor-arg ref="upgradePolicy" />
         <constructor-arg ref="mailSender" />
     </bean>
 
     <!-- UserServiceTx 빈 -->
-    <bean id="userService" class="com.example.UserServiceTx">
+    <bean id="userService" class="com.example.service.UserServiceTx">
         <constructor-arg ref="transactionManager" />
         <constructor-arg ref="userServiceImpl" />
     </bean>
 
     <!-- MailSender 빈 -->
-    <bean id="mailSender" class="com.example.GmailMailSender" />
+    <bean id="mailSender" class="com.example.service.mail.GmailMailSender" />
 
     <!-- UpgradePolicy 빈 -->
-    <bean id="upgradePolicy" class="com.example.UsualUpgradePolicy" />
+    <bean id="upgradePolicy" class="com.example.service.upgrade.UsualUpgradePolicy" />
 
     <!-- PlatformTransactionManager 빈 -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
@@ -29,17 +29,17 @@
     </bean>
 
     <!-- UserDao 빈 -->
-    <bean id="userDao" class="com.example.UserDaoImpl">
+    <bean id="userDao" class="com.example.domain.UserDaoImpl">
         <constructor-arg ref="jdbcTemplate" />
     </bean>
 
     <!-- ConnectionCreator 빈 -->
-    <bean id="connectionCreator" class="com.example.CountingConnectionCreatorDecorator">
+    <bean id="connectionCreator" class="com.example.domain.CountingConnectionCreatorDecorator">
         <constructor-arg ref="realConnectionCreator" />
     </bean>
 
     <!-- Real ConnectionCreator 빈 -->
-    <bean id="realConnectionCreator" class="com.example.ConnectionCreatorImpl" />
+    <bean id="realConnectionCreator" class="com.example.domain.ConnectionCreatorImpl" />
 
     <!-- DataSource 빈 -->
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">

@@ -3,10 +3,15 @@ package com.example.domain;
 import java.util.List;
 
 public interface UserDao {
-public void add(User user);
-public User get(String username);
-public void deleteAll();
-public List<User> getAll();
-public int getCount();
-public void update(User user);
+    void add(User user);
+
+    User get(String username);
+
+    void deleteAll();
+
+    List<User> getAll();
+
+    int getCount();
+
+    void update(User user);
 }
