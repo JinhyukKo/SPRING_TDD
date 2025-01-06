@@ -24,7 +24,7 @@ public class AppConfig {
     }
     @Bean
     public UserService userService() {
-        return new UserServiceTx(transactionManager(),userServiceImpl());
+        return new UserServiceImpl(userDao(),upgradePolicy(),mailSender());
     }
 
     @Bean

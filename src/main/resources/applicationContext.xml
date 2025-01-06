@@ -11,12 +11,6 @@
         <constructor-arg ref="mailSender" />
     </bean>
 
-    <!-- UserServiceTx 빈 -->
-    <bean id="userService" class="com.example.service.UserServiceTx">
-        <constructor-arg ref="transactionManager" />
-        <constructor-arg ref="userServiceImpl" />
-    </bean>
-
     <!-- MailSender 빈 -->
     <bean id="mailSender" class="com.example.service.mail.GmailMailSender" />
 

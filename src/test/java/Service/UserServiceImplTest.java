@@ -7,7 +7,6 @@ import com.example.domain.UserDao;
 import com.example.service.TransactionHandler;
 import com.example.service.UserService;
 import com.example.service.UserServiceImpl;
-import com.example.service.UserServiceTx;
 import com.example.service.upgrade.UsualUpgradePolicy;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,7 +81,6 @@ public class UserServiceImplTest {
 
     @BeforeAll
     public static void setUpContext() {
-//        context = new AnnotationConfigApplicationContext(AppConfig.class);
         context =  new ClassPathXmlApplicationContext("applicationContext.xml");
     }
 
@@ -111,20 +109,7 @@ public class UserServiceImplTest {
 
     }
 
-    @Test
-    void isthesameInstace() {
-        System.out.println(this);
-        System.out.println(userServiceImpl);
-        System.out.println(context);
-    }
 
-    @Test
-    void isthesameInstace2() {
-        System.out.println(this);
-        System.out.println(userServiceImpl);
-        System.out.println(context);
-
-    }
 
     @Test
     void upgradeLevels() throws Exception {
