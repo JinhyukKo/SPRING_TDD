@@ -2,14 +2,14 @@ package com.example.sayHello;
 
 public class HelloTarget implements Hello {
     public String sayHello(String name) {
-        return "Hello " + name;
+        return "hello " + name;
     }
 
     public String sayHi(String name) {
-        return "Hi " + name;
+        return "hi " + name;
     }
 
     public String sayThankYou(String name) {
-        return "Thank you " + name;
+        return "thank you " + name;
     }
 }
