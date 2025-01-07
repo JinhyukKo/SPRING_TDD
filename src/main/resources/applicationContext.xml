@@ -1,27 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
     <!-- UserServiceImpl 빈 -->
-    <bean id="userServiceImpl" class="com.example.service.UserServiceImpl">
+    <bean id="userService" class="com.example.service.UserServiceImpl">
         <constructor-arg ref="userDao"/>
         <constructor-arg ref="upgradePolicy"/>
         <constructor-arg ref="mailSender"/>
     </bean>
 
+
     <!-- UserServiceTx 빈 -->
-    <bean id="userService" class="org.springframework.aop.framework.ProxyFactoryBean">
 
-        <property name="target" ref="userServiceImpl"/>
-
-        <property name="interceptorNames">
-            <list>
-                <value>transactionAdvisor</value>
-            </list>
-        </property>
-    </bean>
 
     <!-- MailSender 빈 -->
     <bean id="mailSender" class="com.example.service.mail.GmailMailSender"/>
@@ -30,20 +25,20 @@
     <bean id="upgradePolicy" class="com.example.service.upgrade.UsualUpgradePolicy"/>
 
     <!-- PlatformTransactionManager 빈 -->
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
+<!--    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
+<!--        <property name="dataSource" ref="dataSource"/>-->
+<!--    </bean>-->
 
-    <bean id="transactionAdvice" class="com.example.service.TransactionAdvice">
-        <property name="transactionManager" ref="transactionManager"/>
-    </bean>
-    <bean id="transactionPointcut" class="org.springframework.aop.support.NameMatchMethodPointcut">
-        <property name="mappedName" value="upgrade*"/>
-    </bean>
-    <bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
-        <property name="advice" ref="transactionAdvice"/>
-        <property name="pointcut" ref="transactionPointcut"/>
-    </bean>
+<!--    <bean id="transactionAdvice" class="com.example.service.TransactionAdvice">-->
+<!--        <property name="transactionManager" ref="transactionManager"/>-->
+<!--    </bean>-->
+<!--    <bean id="transactionPointcut" class="org.springframework.aop.support.NameMatchMethodPointcut">-->
+<!--        <property name="mappedName" value="upgrade*"/>-->
+<!--    </bean>-->
+<!--    <bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">-->
+<!--        <property name="advice" ref="transactionAdvice"/>-->
+<!--        <property name="pointcut" ref="transactionPointcut"/>-->
+<!--    </bean>-->
     <!-- UserDao 빈 -->
     <bean id="userDao" class="com.example.domain.UserDaoImpl">
         <constructor-arg ref="jdbcTemplate"/>
@@ -69,5 +64,7 @@
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
         <constructor-arg ref="dataSource"/>
     </bean>
+    <tx:annotation-driven/>
 
 </beans>
+

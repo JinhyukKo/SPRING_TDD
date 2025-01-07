@@ -16,6 +16,7 @@ import static org.mockito.Mockito.*;
 
 import org.mockito.ArgumentCaptor;
 import org.springframework.aop.framework.ProxyFactoryBean;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -30,6 +31,7 @@ import java.lang.reflect.Proxy;
 import java.util.*;
 
 public class UserServiceImplTest {
+    UserService userService;
     UserServiceImpl userServiceImpl;
     static ApplicationContext context;
     List<User> users = new ArrayList<>();
@@ -78,9 +80,9 @@ public class UserServiceImplTest {
             userDatabase.put(user.getUsername(), user);
         }
 
-        userServiceImpl = context.getBean("userServiceImpl", UserServiceImpl.class);
+        userService = context.getBean("userService",UserService.class);
         userDao = mock(UserDao.class);
-
+        userServiceImpl = new UserServiceImpl();
         when(userDao.getAll()).thenReturn(this.users);
         when(userDao.get(anyString())).thenAnswer(
                 invocation -> {
@@ -94,14 +96,13 @@ public class UserServiceImplTest {
             return null;
         }).when(userDao).update(any(User.class));
 
+
         userServiceImpl.setUserDao(userDao);
 //        userServiceImpl.setMailSender(new TestSender());
         mailSender = mock(MailSender.class);
         userServiceImpl.setMailSender(mailSender);
-
-
+        userServiceImpl.setUpgradePolicy(new UsualUpgradePolicy());
         dataSource = context.getBean(DataSource.class);
-        transactionManager = context.getBean(PlatformTransactionManager.class);
 
 
     }
@@ -135,21 +136,9 @@ public class UserServiceImplTest {
         testUserServiceImpl.setUserDao(this.userDao);
         testUserServiceImpl.setUpgradePolicy(new UsualUpgradePolicy());
         testUserServiceImpl.setMailSender(mailSender);
-//        TransactionHandler txHandler = new TransactionHandler();
-//        txHandler.setTarget(testUserServiceImpl);
-//        txHandler.setTransactionManager(this.transactionManager);
-//        UserService userServiceTx = (UserService) Proxy.newProxyInstance(
-//                getClass().getClassLoader(),
-//                new Class[]{UserService.class},
-//                txHandler
-//        );
-
-        ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);
-        txProxyFactoryBean.setTarget(testUserServiceImpl);
-        UserService userServiceTx= (UserService) txProxyFactoryBean.getObject();
         //ACT
         try {
-            userServiceTx.upgradeLevels();
+            testUserServiceImpl.upgradeLevels();
             throw new RuntimeException("No Exception thrown");
         } catch (UpgradeException e) {
             System.out.println("Upgrade Exception !");
@@ -157,6 +146,7 @@ public class UserServiceImplTest {
 
         //assert
         verify(userDao, times(1)).update(users.get(1)); // 메서드 호출 이후 검증
+        verify(mailSender, times(1)).send(any(SimpleMailMessage.class));
 
     }
 
