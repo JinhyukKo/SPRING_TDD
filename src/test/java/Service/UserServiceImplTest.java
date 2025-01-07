@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
 
 import org.mockito.ArgumentCaptor;
+import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -26,9 +27,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class UserServiceImplTest {
     UserServiceImpl userServiceImpl;
@@ -55,26 +54,7 @@ public class UserServiceImplTest {
     }
 
 
-    static class TestSender implements MailSender {
-        List<String> requests = new ArrayList<>();
 
-        @Override
-        public void send(SimpleMailMessage... simpleMessages) throws MailException {
-        }
-
-        @Override
-        public void send(SimpleMailMessage simpleMessage) throws MailException {
-            SimpleMailMessage message = simpleMessage;
-            String request = message.getTo()[0];
-            requests.add(request);
-        }
-
-        public List<String> getRequests() {
-            return requests;
-        }
-
-
-    }
 
     static class UpgradeException extends RuntimeException {
     }
@@ -93,10 +73,27 @@ public class UserServiceImplTest {
                 new User(4, "username4", "password2", Level.SILVER, 50, 30, "username4@gmail.com"),
                 new User(5, "username5", "password3", Level.GOLD, 20, 30, "username5@gmail.com")
         );
-        userServiceImpl = context.getBean(UserServiceImpl.class);
+        Map<String, User> userDatabase = new HashMap<>();
+        for (User user : users) {
+            userDatabase.put(user.getUsername(), user);
+        }
+
+        userServiceImpl = context.getBean("userServiceImpl", UserServiceImpl.class);
         userDao = mock(UserDao.class);
 
         when(userDao.getAll()).thenReturn(this.users);
+        when(userDao.get(anyString())).thenAnswer(
+                invocation -> {
+                    String username = invocation.getArgument(0);
+                    return userDatabase.get(username);
+                }
+        );
+        doAnswer(invocation -> {
+            User updatedUser = invocation.getArgument(0);
+            userDatabase.put(updatedUser.getUsername(), updatedUser);
+            return null;
+        }).when(userDao).update(any(User.class));
+
         userServiceImpl.setUserDao(userDao);
 //        userServiceImpl.setMailSender(new TestSender());
         mailSender = mock(MailSender.class);
@@ -138,15 +135,18 @@ public class UserServiceImplTest {
         testUserServiceImpl.setUserDao(this.userDao);
         testUserServiceImpl.setUpgradePolicy(new UsualUpgradePolicy());
         testUserServiceImpl.setMailSender(mailSender);
-        TransactionHandler txHandler = new TransactionHandler();
-        txHandler.setTarget(testUserServiceImpl);
-        txHandler.setTransactionManager(this.transactionManager);
-        UserService userServiceTx = (UserService) Proxy.newProxyInstance(
-                getClass().getClassLoader(),
-                new Class[]{UserService.class},
-                txHandler
-        );
+//        TransactionHandler txHandler = new TransactionHandler();
+//        txHandler.setTarget(testUserServiceImpl);
+//        txHandler.setTransactionManager(this.transactionManager);
+//        UserService userServiceTx = (UserService) Proxy.newProxyInstance(
+//                getClass().getClassLoader(),
+//                new Class[]{UserService.class},
+//                txHandler
+//        );
 
+        ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);
+        txProxyFactoryBean.setTarget(testUserServiceImpl);
+        UserService userServiceTx= (UserService) txProxyFactoryBean.getObject();
         //ACT
         try {
             userServiceTx.upgradeLevels();
@@ -183,7 +183,6 @@ public class UserServiceImplTest {
 
     @Test
     void add() {
-        userDao.deleteAll();
         User userWithoutLevel = users.get(0);
         User userWithLevel = users.get(4);
         userWithoutLevel.setLevel(null);

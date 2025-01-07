@@ -12,11 +12,15 @@
     </bean>
 
     <!-- UserServiceTx 빈 -->
-    <bean id="userService" class="com.example.service.TxProxyFactoryBean">
-        <property name="transactionManager" ref="transactionManager"/>
+    <bean id="userService" class="org.springframework.aop.framework.ProxyFactoryBean">
+
         <property name="target" ref="userServiceImpl"/>
-        <property name="pattern" value="upgradeLevels"/>
-        <property name="serviceInterface" value="com.example.service.TxProxyFactoryBean"/>
+
+        <property name="interceptorNames">
+            <list>
+                <value>transactionAdvisor</value>
+            </list>
+        </property>
     </bean>
 
     <!-- MailSender 빈 -->
@@ -30,6 +34,16 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
+    <bean id="transactionAdvice" class="com.example.service.TransactionAdvice">
+        <property name="transactionManager" ref="transactionManager"/>
+    </bean>
+    <bean id="transactionPointcut" class="org.springframework.aop.support.NameMatchMethodPointcut">
+        <property name="mappedName" value="upgrade*"/>
+    </bean>
+    <bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+        <property name="advice" ref="transactionAdvice"/>
+        <property name="pointcut" ref="transactionPointcut"/>
+    </bean>
     <!-- UserDao 빈 -->
     <bean id="userDao" class="com.example.domain.UserDaoImpl">
         <constructor-arg ref="jdbcTemplate"/>
