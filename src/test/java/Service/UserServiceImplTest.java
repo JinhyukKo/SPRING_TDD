@@ -24,6 +24,8 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Method;
@@ -152,7 +154,18 @@ public class UserServiceImplTest {
     }
     @Test
     public void transactionSync(){
+        userService.deleteAll();
+        assert userService.getCount()==0;
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        TransactionStatus status = transactionManager.getTransaction(def);
 
+        userService.add(users.get(0));
+        userService.add(users.get(1));
+        System.out.println(userService.getCount());
+        assert userService.getCount()==2;
+
+        transactionManager.rollback(status);
+        assert userService.getCount()==0;
     }
 
     private void checkLevel(User user, boolean upgrade) {
@@ -163,6 +176,10 @@ public class UserServiceImplTest {
             assert updatedUser.getLevel() == user.getLevel();
         }
 
+    }
+    @Test
+    public void isProxy(){
+        System.out.println(userService.getClass());
     }
 
 
