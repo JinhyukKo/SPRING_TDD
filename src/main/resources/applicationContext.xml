@@ -24,10 +24,9 @@
     <!-- UpgradePolicy 빈 -->
     <bean id="upgradePolicy" class="com.example.service.upgrade.UsualUpgradePolicy"/>
 
-    <!-- PlatformTransactionManager 빈 -->
-<!--    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
-<!--        <property name="dataSource" ref="dataSource"/>-->
-<!--    </bean>-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
 
 <!--    <bean id="transactionAdvice" class="com.example.service.TransactionAdvice">-->
 <!--        <property name="transactionManager" ref="transactionManager"/>-->

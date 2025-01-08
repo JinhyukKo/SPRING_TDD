@@ -103,6 +103,7 @@ public class UserServiceImplTest {
         userServiceImpl.setMailSender(mailSender);
         userServiceImpl.setUpgradePolicy(new UsualUpgradePolicy());
         dataSource = context.getBean(DataSource.class);
+        transactionManager = context.getBean(PlatformTransactionManager.class);
 
 
     }
@@ -147,6 +148,10 @@ public class UserServiceImplTest {
         //assert
         verify(userDao, times(1)).update(users.get(1)); // 메서드 호출 이후 검증
         verify(mailSender, times(1)).send(any(SimpleMailMessage.class));
+
+    }
+    @Test
+    public void transactionSync(){
 
     }
 

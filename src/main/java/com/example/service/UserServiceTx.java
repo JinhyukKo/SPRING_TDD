@@ -7,7 +7,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
 
-public class UserServiceTx implements UserService {
+public class UserServiceTx  {
     UserService userService;
 
     PlatformTransactionManager transactionManager;
@@ -25,7 +25,6 @@ public class UserServiceTx implements UserService {
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
-    @Override
     public void upgradeLevels() {
         TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
         try {
@@ -37,7 +36,7 @@ public class UserServiceTx implements UserService {
         }
     }
 
-    @Override
+gi
     public void add(User user) {
         userService.add(user);
     }
